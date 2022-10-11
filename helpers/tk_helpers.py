@@ -69,11 +69,37 @@ class App(tk.Tk):
             self.bot_result_lbl.configure(image = bot_result_img)
             self.bot_result_lbl.image = bot_result_img
 
+    def update_score_labels(self):
+        # update bot and user score labels
+        max_score = int(self.gui_config["max_score"])
+        if self.USER_SCORE > max_score or self.BOT_SCORE > max_score:
+
+            if self.USER_SCORE > max_score and self.BOT_SCORE > max_score:
+                self.BOT_SCORE = 0
+                self.USER_SCORE = 0
+
+            elif self.USER_SCORE > max_score:
+                self.USER_SCORE -= max_score
+                self.BOT_SCORE = 0
+
+            else:
+                self.BOT_SCORE -= max_score
+                self.USER_SCORE = 0
+
+        user_score_img = getattr(self, "score_" + str(self.USER_SCORE) + "_img")
+        self.user_score_lbl.configure(image = user_score_img)
+        self.user_score_lbl.image = user_score_img
+
+        bot_score_img = getattr(self, "score_" + str(self.BOT_SCORE) + "_img")
+        self.bot_score_lbl.configure(image = bot_score_img)
+        self.bot_score_lbl.image = bot_score_img
+
     def user_shoot(self, user_option):
         # compute the boot shoot option, assess the user vs boot shoot and show result on labels 
         bot_option = bot_shoot()
-        self.user_result, self.bot_result = assess_options(user_option, bot_option)
+        self.user_result, self.bot_result, self.USER_SCORE, self.BOT_SCORE = assess_options(user_option, bot_option, self.USER_SCORE, self.BOT_SCORE)
         self.show_result_labels()
+        self.update_score_labels()
 
     def show_buttons(self):
         # setup buttons
@@ -86,6 +112,31 @@ class App(tk.Tk):
         self.scissor_btn = tk.Button(self, image = self.scissor_img, borderwidth = 0, command=lambda: self.user_shoot(self.scissor))
         self.scissor_btn.place(relx = self.gui_config["btn_relx_scissor"], rely = self.gui_config["btn_rely_scissor"], anchor = 'center')
 
+    def import_result_lbl_img(self):
+        # import shoot result label images
+        self.result_lbl_img_size = int(self.gui_config["result_lbl_img_size"])
+        for option in ["rock", "paper", "scissor"]:
+            for result in ["win", "loss"]:
+                attr = option + "_" + result + "_img"
+                img = self.load_image(self.gui_config[attr + "_path"], self.result_lbl_img_size)
+                setattr(self, attr, img)
+
+    def import_btn_img(self):
+        # import button images
+        self.btn_img_size = int(self.gui_config["btn_img_size"])
+        for option in ["rock", "paper", "scissor"]:
+            attr = option + "_img"
+            img = self.load_image(self.gui_config[attr + "_path"], self.btn_img_size)
+            setattr(self, attr, img)
+
+    def import_score_lbl_img(self):
+        # import score label images   
+        self.score_lbl_img_size = int(self.gui_config["score_lbl_img_size"])
+        for score in map(str, range(int(self.gui_config["max_score"]) + 1)):
+            attr = "score_" + score + "_img"
+            img = self.load_image(self.gui_config[attr + "_path"], self.score_lbl_img_size)
+            setattr(self, attr, img)
+
     def __init__(self):
 
         super().__init__()
@@ -93,24 +144,26 @@ class App(tk.Tk):
         self.rock = "Rock"
         self.paper = "Paper"
         self.scissor = "Scissor"
+        self.USER_SCORE = 0
+        self.BOT_SCORE = 0
         
         # read config
         self.gui_config = dict(read_config()).get("GUI")
 
-        # import label images
-        self.lbl_img_size = int(self.gui_config["lbl_img_size"])
-        self.rock_loss_img = self.load_image(self.gui_config["rock_loss_img_path"], self.lbl_img_size)
-        self.rock_win_img = self.load_image(self.gui_config["rock_win_img_path"], self.lbl_img_size)
-        self.paper_loss_img = self.load_image(self.gui_config["paper_loss_img_path"], self.lbl_img_size)
-        self.paper_win_img = self.load_image(self.gui_config["paper_win_img_path"], self.lbl_img_size)
-        self.scissor_loss_img = self.load_image(self.gui_config["scissor_loss_img_path"], self.lbl_img_size)
-        self.scissor_win_img = self.load_image(self.gui_config["scissor_win_img_path"], self.lbl_img_size)
+        # import label and button images
+        self.import_result_lbl_img()
+        self.import_btn_img()
+        self.import_score_lbl_img()
 
-        # import button images
-        self.btn_img_size = int(self.gui_config["btn_img_size"])
-        self.rock_img = self.load_image(self.gui_config["rock_img_path"], self.btn_img_size)
-        self.paper_img = self.load_image(self.gui_config["paper_img_path"], self.btn_img_size)
-        self.scissor_img = self.load_image(self.gui_config["scissor_img_path"], self.btn_img_size)
+        # setup user score label to 0
+        self.user_score_lbl = tk.Label(self, image = self.score_0_img)
+        self.user_score_lbl.image = self.score_0_img
+        self.user_score_lbl.place(relx = self.gui_config["lbl_relx_user_score"], rely = self.gui_config["lbl_rely_user_score"], anchor = 'center')
+
+        # setup bot score label to 0
+        self.bot_score_lbl = tk.Label(self, image = self.score_0_img)
+        self.bot_score_lbl.image = self.score_0_img
+        self.bot_score_lbl.place(relx = self.gui_config["lbl_relx_bot_score"], rely = self.gui_config["lbl_rely_bot_score"], anchor = 'center')
 
 
     def run(self):
