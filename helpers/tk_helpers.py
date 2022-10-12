@@ -75,8 +75,8 @@ class App(tk.Tk):
         if self.USER_SCORE > max_score or self.BOT_SCORE > max_score:
 
             if self.USER_SCORE > max_score and self.BOT_SCORE > max_score:
-                self.BOT_SCORE = 0
-                self.USER_SCORE = 0
+                self.BOT_SCORE = 1
+                self.USER_SCORE = 1
 
             elif self.USER_SCORE > max_score:
                 self.USER_SCORE -= max_score
@@ -115,8 +115,8 @@ class App(tk.Tk):
     def import_result_lbl_img(self):
         # import shoot result label images
         self.result_lbl_img_size = int(self.gui_config["result_lbl_img_size"])
-        for option in ["rock", "paper", "scissor"]:
-            for result in ["win", "loss"]:
+        for option in self.options:
+            for result in self.results:
                 attr = option + "_" + result + "_img"
                 img = self.load_image(self.gui_config[attr + "_path"], self.result_lbl_img_size)
                 setattr(self, attr, img)
@@ -124,7 +124,7 @@ class App(tk.Tk):
     def import_btn_img(self):
         # import button images
         self.btn_img_size = int(self.gui_config["btn_img_size"])
-        for option in ["rock", "paper", "scissor"]:
+        for option in self.options:
             attr = option + "_img"
             img = self.load_image(self.gui_config[attr + "_path"], self.btn_img_size)
             setattr(self, attr, img)
@@ -146,6 +146,8 @@ class App(tk.Tk):
         self.scissor = "Scissor"
         self.USER_SCORE = 0
         self.BOT_SCORE = 0
+        self.options = ["rock", "paper", "scissor"]
+        self.results = ["win", "loss"]
         
         # read config
         self.gui_config = dict(read_config()).get("GUI")
