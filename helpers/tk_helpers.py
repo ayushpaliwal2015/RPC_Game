@@ -1,5 +1,5 @@
 import tkinter as tk
-from helpers.functions import read_config, RPC_GAME_RULES
+from helpers.functions import read_config
 from ctypes import windll
 from PIL import Image, ImageTk 
 import os
@@ -7,15 +7,30 @@ from agents.agents import Agents
 
 
 windll.shcore.SetProcessDpiAwareness(1)
+
 RPC_ENC  = {"rock": 0, "paper": 1, "scissor": 2}
 
+RPC_GAME_RULES = {
+    str({"rock", "paper"}): "paper",
+    str({"rock", "rock"}) : "rock",
+    str({"rock", "scissor"}): "rock",
+    str({"paper", "paper"}): "paper",
+    str({"scissor", "paper"}): "scissor",
+    str({"scissor", "scissor"}): "scissor"
+}
 
 class App(tk.Tk, Agents):
 
-    def load_image(self, path, size):
+    def load_image(self, path, size = None, img_resize_factor = None):
         # load and resize images per need
         img = Image.open(path)
-        img = img.resize((size, size))
+        if not img_resize_factor:
+            img = img.resize((size, size))
+        else:
+            width, height = img.size
+            width = int(width * img_resize_factor)
+            height = int(height * img_resize_factor)
+            img = img.resize((width, height))
         img = ImageTk.PhotoImage(img)
         return img
         
@@ -54,22 +69,12 @@ class App(tk.Tk, Agents):
     def show_result_labels(self):
         # show appropriate label as per results
         user_result_img = getattr(self, self.user_result)
-        if not hasattr(self, "user_result_lbl"):
-            self.user_result_lbl = tk.Label(self, image = user_result_img)
-            self.user_result_lbl.image = user_result_img
-            self.user_result_lbl.place(relx = self.gui_config["lbl_relx_user"], rely = self.gui_config["lbl_rely_user"], anchor = 'center')
-        else:
-            self.user_result_lbl.configure(image = user_result_img)
-            self.user_result_lbl.image = user_result_img
+        self.user_result_lbl.configure(image = user_result_img)
+        self.user_result_lbl.image = user_result_img
 
         bot_result_img = getattr(self, self.bot_result)
-        if not hasattr(self, "bot_result_lbl"):
-            self.bot_result_lbl = tk.Label(self, image = bot_result_img)
-            self.bot_result_lbl.image = bot_result_img
-            self.bot_result_lbl.place(relx = self.gui_config["lbl_relx_bot"], rely = self.gui_config["lbl_rely_bot"], anchor = 'center')
-        else:
-            self.bot_result_lbl.configure(image = bot_result_img)
-            self.bot_result_lbl.image = bot_result_img
+        self.bot_result_lbl.configure(image = bot_result_img)
+        self.bot_result_lbl.image = bot_result_img
 
     def update_score_labels(self):
         # update bot and user score labels
@@ -190,6 +195,18 @@ class App(tk.Tk, Agents):
         self.bot_score_lbl = tk.Label(self, image = self.score_0_img)
         self.bot_score_lbl.image = self.score_0_img
         self.bot_score_lbl.place(relx = self.gui_config["lbl_relx_bot_score"], rely = self.gui_config["lbl_rely_bot_score"], anchor = 'center')
+
+        # setup bot icon on window 
+        self.user_img = self.load_image(self.gui_config["user_img"], img_resize_factor = float(self.gui_config["avtr_img_resize_factor"]))
+        self.user_result_lbl = tk.Label(self, image = self.user_img)
+        self.user_result_lbl.image = self.user_img
+        self.user_result_lbl.place(relx = self.gui_config["lbl_relx_user"], rely = self.gui_config["lbl_rely_user"], anchor = 'center')
+
+        # setup user icon on window 
+        self.bot_img = self.load_image(self.gui_config["bot_img"], img_resize_factor = float(self.gui_config["avtr_img_resize_factor"]))
+        self.bot_result_lbl = tk.Label(self, image = self.bot_img)
+        self.bot_result_lbl.image = self.bot_img
+        self.bot_result_lbl.place(relx = self.gui_config["lbl_relx_bot"], rely = self.gui_config["lbl_rely_bot"], anchor = 'center')
 
 
     def run(self):
