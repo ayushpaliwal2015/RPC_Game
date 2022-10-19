@@ -2,6 +2,7 @@
 ## Activate Virtual Env     ## path/to/venv/Scripts/activate    ## C:/users/ayush/venv/Scripts/activate
 ## Upgrade pip              ## pip install --upgrade pip
 ## Install dependencies     ## pip install -r requirements.txt
+## If Python isn't on your Windows path, you may need to type out the full path to pyinstaller to get it to run.
 
 from ctypes import windll
 windll.shcore.SetProcessDpiAwareness(1)

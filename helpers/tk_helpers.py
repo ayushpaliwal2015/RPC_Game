@@ -1,14 +1,16 @@
 import tkinter as tk
-from helpers.functions import read_config, assess_options, bot_shoot
+from helpers.functions import read_config, RPC_GAME_RULES
 from ctypes import windll
-windll.shcore.SetProcessDpiAwareness(1)
 from PIL import Image, ImageTk 
 import os
-from tkinter import ttk
+from agents.agents import Agents
 
 
+windll.shcore.SetProcessDpiAwareness(1)
+RPC_ENC  = {"rock": 0, "paper": 1, "scissor": 2}
 
-class App(tk.Tk):
+
+class App(tk.Tk, Agents):
 
     def load_image(self, path, size):
         # load and resize images per need
@@ -94,12 +96,33 @@ class App(tk.Tk):
         self.bot_score_lbl.configure(image = bot_score_img)
         self.bot_score_lbl.image = bot_score_img
 
+    # function to assess the result and return the corresponding labels
+    def assess_options(self, user_option, bot_option):
+
+        winner_option = RPC_GAME_RULES.get(str({user_option, bot_option}))
+        if user_option == winner_option and bot_option == winner_option:
+            self.USER_SCORE += 1; self.BOT_SCORE += 1; history = 1
+            return winner_option + "_win_img", winner_option + "_win_img", self.USER_SCORE, self.BOT_SCORE, history
+
+        elif user_option == winner_option:
+            self.USER_SCORE += 1; history = 0
+            return user_option + "_win_img", bot_option + "_loss_img", self.USER_SCORE, self.BOT_SCORE, history
+
+        else:
+            self.BOT_SCORE += 1; history = 2
+            return user_option + "_loss_img", bot_option + "_win_img", self.USER_SCORE, self.BOT_SCORE, history
+
     def user_shoot(self, user_option):
         # compute the boot shoot option, assess the user vs boot shoot and show result on labels 
-        bot_option = bot_shoot()
-        self.user_result, self.bot_result, self.USER_SCORE, self.BOT_SCORE = assess_options(user_option, bot_option, self.USER_SCORE, self.BOT_SCORE)
+        bot_option = self.bot_shoot()
+        self.user_result, self.bot_result, self.USER_SCORE, self.BOT_SCORE, history = self.assess_options(user_option, bot_option)
         self.show_result_labels()
         self.update_score_labels()
+
+        # collect the boot and user shoot option and the result
+        self.agent_history.append(RPC_ENC.get(bot_option))
+        self.player_history.append(RPC_ENC.get(user_option))
+        self.win_history.append(history)
 
     def show_buttons(self):
         # setup buttons
@@ -139,11 +162,12 @@ class App(tk.Tk):
 
     def __init__(self):
 
-        super().__init__()
+        tk.Tk.__init__(self)
+        Agents.__init__(self)
 
-        self.rock = "Rock"
-        self.paper = "Paper"
-        self.scissor = "Scissor"
+        self.rock = "rock"
+        self.paper = "paper"
+        self.scissor = "scissor"
         self.USER_SCORE = 0
         self.BOT_SCORE = 0
         self.options = ["rock", "paper", "scissor"]
