@@ -269,6 +269,7 @@ class App(tk.Tk, Agents):
         self.update_button_status(tk.NORMAL)
         self.pop_up_window.destroy()
         self.update_score_labels()
+        self.reset_avatars()
 
     def add_pop_buttons(self):
         btn_height = int(self.gui_config["btn_height_pop"])
@@ -290,4 +291,3 @@ class App(tk.Tk, Agents):
         self.setup_pop_gui("pop")
         self.add_pop_buttons()
         self.add_pop_labels()
-        self.reset_avatars()

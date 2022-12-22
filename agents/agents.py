@@ -6,6 +6,7 @@ from random import shuffle
 RPC_REV_ENC = {0: "rock", 1: "paper", 2: "scissor"}
 OPPONENT_ENC = {"agent": 2, "draw": 1, "player": 0}
 OPPONENT_REV_ENC = {2: "agent", 1: "draw", 0: "player"}
+OPPOSITE_OPTION_MAPPING = {0:1, 1:2, 2:1}
 
 # TODO: add comments in this module
 class Agents:
@@ -61,10 +62,32 @@ class Agents:
     return option
 
   def throw_agent_1(self):
-    return 0
+    # If bot won, bot will throw what he won with
+    if self.win_history[-1] == 2:
+      return self.agent_history[-1]
 
+    # If bot lost, bot will throw what the player won with
+    elif self.win_history[-1] == 0:
+      return self.player_history[-1]
+
+    # If it was a draw then throw what will defeat the last option
+    else:
+      return OPPOSITE_OPTION_MAPPING.get(self.agent_history[-1])
+
+  # Opposite of agent 1 rules
   def throw_agent_2(self):
-    return 1
+
+    # If bot won, bot will throw what Opposite of what he won with
+    if self.win_history[-1] == 2:
+      return self.player_history[-1]
+
+    # If bot lost, bot will throw the same option
+    elif self.win_history[-1] == 0:
+      return self.agent_history[-1]
+
+    # If it was a draw then throw the last option again
+    else:
+      return self.agent_history[-1]
 
   def throw_agent_3(self):
     return 2
