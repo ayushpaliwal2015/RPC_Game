@@ -123,6 +123,12 @@ class App(tk.Tk, Agents):
             self.BOT_SCORE += 1; history = 2
             return user_option + "_loss_img", bot_option + "_win_img", self.USER_SCORE, self.BOT_SCORE, history
 
+    # collect the bot and user shoot option and the result 
+    def update_play_history(self, user_option, bot_option, history):
+        self.agent_history.append(RPC_ENC.get(bot_option))
+        self.player_history.append(RPC_ENC.get(user_option))
+        self.win_history.append(history)
+
     def user_shoot(self, user_option):
         # compute the boot shoot option, assess the user vs boot shoot and show result on labels 
         bot_option = self.bot_shoot()
@@ -130,10 +136,8 @@ class App(tk.Tk, Agents):
         self.show_result_labels()
         self.update_score_labels()
 
-        # collect the bot and user shoot option and the result
-        self.agent_history.append(RPC_ENC.get(bot_option))
-        self.player_history.append(RPC_ENC.get(user_option))
-        self.win_history.append(history)
+        # update history
+        self.update_play_history(user_option, bot_option, history)
 
         # reset or close the app when max score is reached
         max_score = int(self.gui_config["max_score"])
@@ -177,6 +181,39 @@ class App(tk.Tk, Agents):
             img = self.load_image(self.gui_config[attr + "_path"], self.score_lbl_img_size)
             setattr(self, attr, img)
 
+    def init_score_lables(self):
+        # setup user score label to 0
+        self.user_score_lbl = tk.Label(self, image = self.score_0_img)
+        self.user_score_lbl.image = self.score_0_img
+        self.user_score_lbl.place(relx = self.gui_config["lbl_relx_user_score"], rely = self.gui_config["lbl_rely_user_score"], anchor = 'center')
+
+        # setup bot score label to 0
+        self.bot_score_lbl = tk.Label(self, image = self.score_0_img)
+        self.bot_score_lbl.image = self.score_0_img
+        self.bot_score_lbl.place(relx = self.gui_config["lbl_relx_bot_score"], rely = self.gui_config["lbl_rely_bot_score"], anchor = 'center')
+
+    def init_bot_labels(self):
+        # setup bot icon on window 
+        self.user_img = self.load_image(self.gui_config["user_img"], img_resize_factor = float(self.gui_config["avtr_img_resize_factor"]))
+        self.user_result_lbl = tk.Label(self, image = self.user_img)
+        self.user_result_lbl.image = self.user_img
+        self.user_result_lbl.place(relx = self.gui_config["lbl_relx_user"], rely = self.gui_config["lbl_rely_user"], anchor = 'center')
+
+        # setup user icon on window 
+        self.bot_img = self.load_image(self.gui_config["bot_img"], img_resize_factor = float(self.gui_config["avtr_img_resize_factor"]))
+        self.bot_result_lbl = tk.Label(self, image = self.bot_img)
+        self.bot_result_lbl.image = self.bot_img
+        self.bot_result_lbl.place(relx = self.gui_config["lbl_relx_bot"], rely = self.gui_config["lbl_rely_bot"], anchor = 'center')
+
+
+    def init_naming_labels(self):
+        # setup user and bot labels on window
+        self.bot_lbl = tk.Label(self, text = "BOT", font = ("Segoe UI", 10, "bold"))
+        self.bot_lbl.place(relx = self.gui_config["lbl_relx_bot_name"], rely = self.gui_config["lbl_rely_bot_name"], anchor = 'center')
+
+        self.user_lbl = tk.Label(self, text = "YOU", font = ("Segoe UI", 10, "bold"))
+        self.user_lbl.place(relx = self.gui_config["lbl_relx_you_name"], rely = self.gui_config["lbl_rely_you_name"], anchor = 'center')
+
     def __init__(self):
 
         tk.Tk.__init__(self)
@@ -198,27 +235,16 @@ class App(tk.Tk, Agents):
         self.import_btn_img()
         self.import_score_lbl_img()
 
-        # setup user score label to 0
-        self.user_score_lbl = tk.Label(self, image = self.score_0_img)
-        self.user_score_lbl.image = self.score_0_img
-        self.user_score_lbl.place(relx = self.gui_config["lbl_relx_user_score"], rely = self.gui_config["lbl_rely_user_score"], anchor = 'center')
+        # initialize score labels to zero
+        self.init_score_lables()
 
-        # setup bot score label to 0
-        self.bot_score_lbl = tk.Label(self, image = self.score_0_img)
-        self.bot_score_lbl.image = self.score_0_img
-        self.bot_score_lbl.place(relx = self.gui_config["lbl_relx_bot_score"], rely = self.gui_config["lbl_rely_bot_score"], anchor = 'center')
+        # initialize bot labels
+        self.init_bot_labels()
 
-        # setup bot icon on window 
-        self.user_img = self.load_image(self.gui_config["user_img"], img_resize_factor = float(self.gui_config["avtr_img_resize_factor"]))
-        self.user_result_lbl = tk.Label(self, image = self.user_img)
-        self.user_result_lbl.image = self.user_img
-        self.user_result_lbl.place(relx = self.gui_config["lbl_relx_user"], rely = self.gui_config["lbl_rely_user"], anchor = 'center')
+        # initialize name labels
+        self.init_naming_labels()
 
-        # setup user icon on window 
-        self.bot_img = self.load_image(self.gui_config["bot_img"], img_resize_factor = float(self.gui_config["avtr_img_resize_factor"]))
-        self.bot_result_lbl = tk.Label(self, image = self.bot_img)
-        self.bot_result_lbl.image = self.bot_img
-        self.bot_result_lbl.place(relx = self.gui_config["lbl_relx_bot"], rely = self.gui_config["lbl_rely_bot"], anchor = 'center')
+
 
     # set GUI window
     def setup_main_gui(self, window_name):

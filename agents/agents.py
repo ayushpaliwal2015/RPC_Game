@@ -28,6 +28,7 @@ class Agents:
     self.first_n_random_rounds = int(self.agent_config.get("first_n_random_rounds"))
     self.no_of_agent_id_replications = int(self.agent_config.get("no_of_agent_id_replications"))
 
+    # Non Random Agents Only
     self.agent_ids = json.loads(self.agent_config.get("agent_ids"))
     shuffle(self.agent_ids)
     self.agent_ids = self.agent_ids * self.no_of_agent_id_replications
