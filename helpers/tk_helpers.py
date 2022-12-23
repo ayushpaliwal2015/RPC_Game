@@ -57,7 +57,7 @@ class App(tk.Tk, Agents):
 
     def set_window_position(self):
         # open main window on the top most postiton
-        self.attributes('-topmost', 1)
+        self.attributes('-topmost', 0)
 
     def set_window_icon(self):
         # setup the app icon
@@ -289,6 +289,9 @@ class App(tk.Tk, Agents):
 
         # close App if pop up window is closed
         self.pop_up_window.protocol('WM_DELETE_WINDOW', lambda: self.destroy())
+
+        # open the window on the top most position
+        self.pop_up_window.attributes('-topmost', 0)
 
     def reset_game(self):
         self.reset_scores()
