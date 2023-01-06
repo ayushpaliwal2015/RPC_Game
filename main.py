@@ -1,5 +1,5 @@
-## Create Virtaul Env       ## python -m venv /path/to/venv
-## Activate Virtual Env     ## path/to/venv/Scripts/activate    ## C:/users/ayush/venv/Scripts/activate
+## Create Virtaul Env       ## python -m venv /path/to/rpc_venv
+## Activate Virtual Env     ## path/to/rpc_venv/Scripts/activate    ## C:/users/ayush/rpc_venv/Scripts/activate
 ## Upgrade pip              ## pip install --upgrade pip
 ## Install dependencies     ## pip install -r requirements.txt
 ## If Python isn't on your Windows path, you may need to type out the full path to pyinstaller to get it to run.
