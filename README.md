@@ -7,7 +7,7 @@
 ![](https://img.shields.io/badge/Status-Stable-green.svg)
 
 
-### <p align="center"><b>This is Rock Paper Scissor Game made by Python Tkinter </b></p>
+### <p align="center"><b>This is Rock Paper Scissor Game </b></p>
 
 ***
 
